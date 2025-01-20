@@ -17,7 +17,8 @@ class StatusListener(Thread):
 
     def run(self):
         self.socket = socket(AF_INET, SOCK_DGRAM)
-        self.socket.setsockopt(SOL_SOCKET, SO_REUSEPORT, 1)
+        self.socket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+        self.socket.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
         self.socket.bind(('', self.listener_port))
         logging.info('{} listening for status updates on port {}...'.format(SERVICE_NAME, self.listener_port))
 

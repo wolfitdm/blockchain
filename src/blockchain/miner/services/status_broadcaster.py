@@ -26,6 +26,7 @@ class StatusBroadcaster(Thread):
         blockchain_length = self._get_blockchain_status_value()
         status_message_bytes = text_to_bytes('{}:{}'.format(blockchain_length, self.block_server_port))
         s = socket(AF_INET, SOCK_DGRAM)
+        s.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
         s.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
         s.sendto(status_message_bytes, (BROADCAST_ADDRESS, self.broadcast_port))
         s.close()

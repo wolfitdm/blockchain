@@ -10,7 +10,7 @@ from blockchain.common.services.transaction_helper import build_transaction
 import re
 import logging
 
-ADDRESS_PATTERN = re.compile('^[a-f0-9]{64}$')
+ADDRESS_PATTERN = re.compile('^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$')
 
 class SendCommand:
     NAME  = 'send'
