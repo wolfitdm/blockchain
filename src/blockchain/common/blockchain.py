@@ -1,6 +1,8 @@
 from blockchain.common.crypto import Crypto
 from blockchain.common.crypto import config
 
+import logging
+
 class Blockchain:
     def __init__(self):
         self.blocks = []
@@ -26,6 +28,7 @@ class Blockchain:
             self.address_balances[to_address]   -= amount
 
     def add_block(self, new_block):
+        logging.info("add new block")
         if len(self.blocks) == 0:
             if new_block.id == config.get('genesis_block_id'):
                 self.blocks.append(new_block)
@@ -48,15 +51,18 @@ class Blockchain:
         transaction_ids_for_new_block = set()
 
         for transaction in new_block.transactions:
+            logging.info("transaction " + transaction.id)
             if not Crypto.validate_transaction(transaction):
                 raise ValueError('Invalid transaction in new block (bad signature): {}'.format(transaction))
-
+            
+            logging.info("validate_transaction " + transaction.id)
             if self.has_transaction(transaction):
                 raise ValueError('Transaction with id {} already exists within the blockchain'.format(transaction.id))
-
+            
             if transaction.id in transaction_ids_for_new_block:
                 raise ValueError('Duplicate transaction in new block, id: {}'.format(transaction.id))
 
+            logging.info("add_transaction " + transaction.id)
             transaction_ids_for_new_block.add(transaction.id)
 
             from_address = transaction.from_address
@@ -86,6 +92,7 @@ class Blockchain:
 
             transaction_index += 1
 
+        logging.info("add_block_new " + str(len(self.blocks)))
         self.blocks.append(new_block)
         self.address_balances = address_balances
 

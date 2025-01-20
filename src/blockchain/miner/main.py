@@ -75,6 +75,7 @@ class MiningServer:
         self.stop_mining_event.set()
 
     def _on_new_transaction(self, transaction):
+        logging.info("Transaction putted here " + transaction.id)
         self.work_queue.put(transaction)
 
     def _on_new_status(self, blockchain_length, host, port):

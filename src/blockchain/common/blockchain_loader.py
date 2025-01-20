@@ -21,9 +21,9 @@ class BlockchainLoader:
             blockchain = Blockchain()
             genesis_block = Block()
             genesis_block.id = config.get('genesis_block_id')
-            genesis_block
             blockchain.blocks.append(genesis_block)
             logging.info('No blockchain found, initialised new chain with genesis block')
+            self._save(blockchain)
             return blockchain
 
     def _save(self, blockchain):
