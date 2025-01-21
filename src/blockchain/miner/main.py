@@ -17,7 +17,8 @@ from blockchain.common.config import update_config_from_args
 KEY_NAME = 'mining_rewards'
 
 class MiningServer:
-    def __init__(self):
+    def __init__(self, main_thread=True):
+        self.main_thread = main_thread
         self.shutdown_event = Event()
         self.stop_mining_event = Event()
 
@@ -53,19 +54,29 @@ class MiningServer:
         self.status_listener.close()
         self.transaction_listener.close()
         self.block_miner.stop()
-
-    def start(self):
+        
+    def signal_quit(self):
         signal.signal(signal.SIGINT, self._quit)
 
-        # Miners do several jobs...
-        self.status_broadcaster.start()   # tell everyone else the length of the blockchain that we have
-        self.block_server.start()         # listen for requests for the latest blockchain (from wallets or other miners)
-        self.status_listener.start()      # listen for other miners telling us the length of their blockchains
-        self.transaction_listener.start() # listen for new transactions from wallets
-        self.block_miner.start()          # mine new blocks
+    def start(self):
+        try:
+            if self.main_thread:
+               self.signal_quit()
 
-        self.shutdown_event.wait()
-        logging.info("Main thread stopped")
+            logging.info("Main thread start all")
+            print("Main thread mining server start all")
+            # Miners do several jobs...
+            self.status_broadcaster.start()   # tell everyone else the length of the blockchain that we have
+            self.block_server.start()         # listen for requests for the latest blockchain (from wallets or other miners)
+            self.status_listener.start()      # listen for other miners telling us the length of their blockchains
+            self.transaction_listener.start() # listen for new transactions from wallets
+            self.block_miner.start()          # mine new blocks
+
+            self.shutdown_event.wait()
+            logging.info("Main thread stopped")
+            print("Main thread mining server stop all")
+        except KeyboardInterrupt:
+            raise KeyboardInterrupt()
 
     def _on_new_block_mined(self, block):
         BlockchainLoader().process(lambda blockchain : blockchain.add_block(block))

@@ -14,11 +14,15 @@ ADDRESS_PATTERN = re.compile('^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$')
 
 class SendCommand:
     NAME  = 'send'
+    NAME_RPC = 'sendMoney'
     USAGE = '{} <from address> <amount> <to address>'.format(NAME)
+    USAGE_RPC = '{} <from address> <amount> <to address>'.format(NAME_RPC)
 
     def __init__(self, *args):
         if len(args) != 3:
-            logging.error('wrong number of args for {}'.format(SendCommand.NAME))
+            self.last_print_message = 'wrong number of args for {}'.format(SendCommand.NAME)
+            logging.error(self.last_print_message)
+            print(self.last_print_message)
 
         else:
             from_address_or_key, amount_txt, to_address_or_key = args
@@ -27,20 +31,28 @@ class SendCommand:
             key = crypto.get_key(from_address_or_key) or crypto.get_key_by_address(from_address_or_key)
 
             if not key:
-                logging.error('invalid from address/key')
+                self.last_print_message = 'invalid from address/key'
+                logging.error(self.last_print_message)
+                print(self.last_print_message)
 
             elif not (crypto.get_key(to_address_or_key) or self._is_valid_address_format(to_address_or_key)):
-                logging.error('invalid to address/key')
+                self.last_print_message = 'invalid to address/key'
+                logging.error(self.last_print_message)
+                print(self.last_print_message)
 
             elif not self._is_valid_amount_format(amount_txt):
-                logging.error('invalid amount')
+                self.last_print_message = 'invalid amount'
+                logging.error(self.last_print_message)
+                print(self.last_print_message)
 
             else:
                 balance = BlockchainLoader().process(lambda b : b.get_balance_for_address(key.address))
                 amount = float(amount_txt)
 
                 if balance < amount:
-                    logging.error('Insufficient funds, current balance for this address is {}'.format(balance))
+                    self.last_print_message = 'Insufficient funds, current balance for this address is {}'.format(balance)
+                    logging.error(self.last_print_message)
+                    print(self.last_print_message)
 
                 else:
                     to_address_key = crypto.get_key(to_address_or_key)
@@ -54,6 +66,8 @@ class SendCommand:
                     UnconfirmedPaymentsLoader().process(lambda u_p : u_p.add(transaction))
 
                     SendCommand.send_transaction(transaction)
+                    self.last_print_message = 'Send money ({}) from {} to {}!'.format(balance, key.address, to_address)
+                    print(self.last_print_message)
 
     @staticmethod
     def send_transaction(transaction):
@@ -71,3 +85,5 @@ class SendCommand:
         except ValueError:
             return False
 
+    def get_last_results(self):
+        return self.last_print_message

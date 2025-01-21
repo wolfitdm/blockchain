@@ -8,7 +8,7 @@ import signal
 import logging
 from threading import Event, Timer
 
-class SyncCommand:
+class SyncCommandEx:
     NAME  = 'sync'
     NAME_RPC = 'syncNetwork'
     USAGE = '{}'.format(NAME)
@@ -16,8 +16,9 @@ class SyncCommand:
 
     def __init__(self, *args):
         if len(args) != 0:
-            logging.error('wrong number of args for {}'.format(SyncCommand.NAME))
-            print('wrong number of args for {}'.format(SyncCommand.NAME))
+            self.last_print_message = 'wrong number of args for {}'.format(SyncCommand.NAME)
+            logging.error(self.last_print_message)
+            print(self.last_print_message)
         else:
             self.shutdown_event = Event()
             self.broadcast_interval = config.get('transaction_broadcast_interval_seconds')
@@ -25,9 +26,10 @@ class SyncCommand:
             on_status_update = BlockchainUpdater(self._on_new_block).handle_status_update
             self.listener = Network().find_host_to_sync(on_status_update, self.shutdown_event)
 
-            signal.signal(signal.SIGINT, self._quit)
+            #signal.signal(signal.SIGINT, self._quit)
 
-            print('Synchronising with the network, press Ctrl-C to quit')
+            self.last_print_message = 'Synchronising with the network, press Ctrl-C to quit'
+            print(self.last_print_message)
             self._sync_unconfirmed_payments()
             self._send_unconfirmed_payments()
 
@@ -62,3 +64,6 @@ class SyncCommand:
         self.shutdown_event.set()
         self.listener.close()
         self.broadcast_timer.cancel()
+        
+    def get_last_results(self):
+        return self.last_print_message
