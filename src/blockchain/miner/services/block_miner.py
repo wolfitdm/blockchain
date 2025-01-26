@@ -32,7 +32,7 @@ class BlockMiner(Thread):
             if self.current_unmined_block.is_mineable():
                 mining_reward_transaction = self._build_mining_reward_transaction()
                 self.current_unmined_block.add(mining_reward_transaction)
-
+                self.current_unmined_block.buildMerkleTree()
                 logging.info('{} started mining new block'.format(SERVICE_NAME))
                 mined_block = self._mine(self.current_unmined_block)
                 if mined_block:

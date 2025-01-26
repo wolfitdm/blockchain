@@ -1,8 +1,12 @@
 from blockchain.common.blockchain import Blockchain
 from blockchain.common.block import Block
 from blockchain.common.transaction import Transaction
-
+from blockchain.common.hash import hash_string_to_hex
 import json
+
+
+from blockchain.common.utils import text_to_bytes
+from blockchain.common.utils import bytes_to_text
 
 def blockchain_decode(blockchain_json):
     blockchain_dict = json.loads(blockchain_json)
@@ -27,15 +31,38 @@ def block_from_dict(block_dict):
     block.previous_block_id = block_dict['previous_block_id']
     block.transactions = list(map(transaction_from_dict, block_dict['transactions']))
     block.nonce = block_dict['nonce']
+    
+    if 'merkleRootHash' in block_dict:
+       block.merkleRootHash = block_dict['merkleRootHash']
+    else:
+       block.merkleRootHash = ''
+       
+    if 'merkleTree' in block_dict:
+       block.merkleTree = block_dict['merkleTree']
+    else:
+       block.merkleTree = []
+
     return block
 
 def block_to_dict(block):
-    return {
+    ret_dict = {
         'id' : block.id,
         'previous_block_id' : block.previous_block_id,
         'transactions' : list(map(transaction_to_dict, block.transactions)),
         'nonce' : block.nonce
     }
+    
+    if hasattr(block, 'merkleRootHash'):
+       ret_dict['merkleRootHash'] = block.merkleRootHash
+    else:
+       ret_dict['merkleRootHash'] = ''
+       
+    if hasattr(block, 'merkleTree'):
+       ret_dict['merkleTree'] = block.merkleTree
+    else:
+       ret_dict['merkleTree'] = []
+
+    return ret_dict
 
 def block_decode(block_json):
     block_dict = json.loads(block_json)
@@ -61,6 +88,7 @@ def transaction_from_dict(transaction_dict):
     transaction.timestamp = transaction_dict['timestamp']
     transaction.signature = transaction_dict['signature']
     transaction.id        = transaction_dict['id']
+    transaction.script = transaction_dict['script']
 
     return transaction
 
@@ -72,7 +100,8 @@ def transaction_to_dict(transaction):
         'timestamp'    : transaction.timestamp,
         'public_key'   : transaction.public_key,
         'signature'    : transaction.signature,
-        'id'           : transaction.id
+        'id'           : transaction.id,
+        'script'       : transaction.script
     }
 
 def transaction_decode(transaction_json):

@@ -91,7 +91,8 @@ class Blockchain:
             address_balances[to_address]   = current_to_address_balance + amount
 
             transaction_index += 1
-
+        
+        new_block.buildMerkleTree()
         logging.info("add_block_new " + str(len(self.blocks)))
         self.blocks.append(new_block)
         self.address_balances = address_balances

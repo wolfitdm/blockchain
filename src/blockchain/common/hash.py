@@ -11,6 +11,8 @@ sys.path.insert(0, os.path.join(app_dir, "src"))  # Imports relative to src
 from lib import pybitcointools as btctools
 
 from blockchain.common.utils import text_to_bytes
+from blockchain.common.utils import bytes_to_text
+
 
 def hash(data):
     return btctools.bin_sha256(data)
@@ -23,3 +25,24 @@ def hash_string(text):
 
 def hash_string_to_hex(text):
     return hash_to_hex(text_to_bytes(text))
+
+def hash_name(data):
+    return btctools.bin_hash160(data)
+    
+def hash_name_safe(data):
+    return btctools.hash160(data)
+    
+    
+def op_name(op=-1, name=0, value=0, days=0, pubkey=0):
+    name = str(name)
+    value = str(value)
+    days = str(days)
+    pubkey = str(pubkey)
+    if op == 0:
+       return ["n", name]
+    elif op == 1:
+       return ["f", name, days]
+    elif op == 2:
+       return ["u", name, value, days]
+       
+    return []
