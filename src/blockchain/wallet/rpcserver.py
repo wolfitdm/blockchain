@@ -23,12 +23,12 @@ def syncNetwork():
     s = SyncCommandEx()
     return s.get_last_results()
 
-from blockchain.common.rpc import RPCServer
+from blockchain.common.defaultrpc import get_new_rpc_server
 
 class BlockchainRPCServer:
     def __init__(self, main_thread=True):
         self.main_thread = main_thread
-        self.server = RPCServer()
+        self.server = get_new_rpc_server()
         self.server.registerMethod(sendMoney)
         self.server.registerMethod(newAddress)
         self.server.registerMethod(listAddresses)

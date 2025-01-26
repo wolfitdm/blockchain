@@ -12,7 +12,12 @@ config = {
     'transaction_broadcast_interval_seconds' : 5,
     'status_broadcast_port' : 2606,
     'block_server_port' : 2607,
-    'transaction_port' : 2608
+    'transaction_port' : 2608,
+    'rpc_address': '0.0.0.0',
+    'rpc_client_address': '127.0.0.1',
+    'rpc_port': 8888,
+    'rpc_priv_key': 'L1NgKMFuEZpMzGDAB5x8UEq8eGcYtgsc1uVsvvkJiyFBbxKctKPF',
+    'rpc_login_password': 'login:password'
 }
 
 

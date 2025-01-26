@@ -8,6 +8,8 @@ from blockchain.wallet.commands.list_addresses import ListAddressesCommand
 from blockchain.wallet.commands.sync import SyncCommand
 from blockchain.common.config import update_config_from_args
 
+from blockchain.common.defaultrpc import get_new_rpc_client
+
 COMMANDS_NAMES = ["sendMoney", "newAddress", "listAddresses", "syncNetwork"]
 COMMANDS = [SendCommand, MakeAddressCommand, ListAddressesCommand, SyncCommand]
 USAGE = ' | '.join(map(lambda c : c.USAGE_RPC, COMMANDS))
@@ -18,7 +20,7 @@ if __name__ == '__main__':
     if len(sys.argv) < 2:
         logging.info('Usage: python {} ({})'.format(sys.argv[0], USAGE))
     else:
-        server = RPCClient('127.0.0.1', 8888)
+        server = get_new_rpc_client()
         server.connect()
         args = update_config_from_args(sys.argv)
         user_command_name = args[1]
